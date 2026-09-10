@@ -45,7 +45,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-MODEL = "llama-3.3-70b-versatile"
+MODEL = "openai/gpt-oss-120b"
 
 SECTIONS = [
     ("introduction", "Introduction"),
