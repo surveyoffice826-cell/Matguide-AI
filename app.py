@@ -40,7 +40,7 @@ import json
 import os
 import re
 from datetime import datetime
-from urllib.parse import quote
+from urllib.parse import quote, quote_plus
 
 import requests
 import streamlit as st
@@ -227,7 +227,7 @@ def query_material(material: str, api_key: str) -> dict:
 
 
 @st.cache_data(show_spinner=False, ttl=86400)
-def find_material_image(material: str) -> str:
+def find_material_image(material: str, dark_mode: bool) -> str:
     """Look up a reference photo for the material via Wikipedia's free
     public API (no key needed). Falls back to a clean text placeholder
     (via placehold.co, also free/no key) if nothing is found, so a
@@ -244,9 +244,9 @@ def find_material_image(material: str) -> str:
                     return thumb
         except Exception:  # noqa: BLE001
             continue
-    label = quote(material.strip()[:30] or "Material")
-    bg = "4FA8E0" if st.session_state.dark_mode else "1F4E79"
-    return f"https://placehold.co/600x360/{bg}/FFFFFF?text={label}&font=roboto"
+    label = quote_plus(material.strip()[:30] or "Material")
+    bg = "4FA8E0" if dark_mode else "1F4E79"
+    return f"https://placehold.co/600x360/{bg}/FFFFFF.png?text={label}&font=roboto"
 
 
 def add_to_history(material: str, data: dict) -> None:
@@ -322,7 +322,7 @@ def whatsapp_link(material: str, data: dict) -> str:
 def render_result(material: str, data: dict) -> None:
     st.write("")
 
-    st.image(find_material_image(material), caption=material, use_container_width=True)
+    st.image(find_material_image(material, st.session_state.dark_mode), caption=material, use_container_width=True)
 
     render_rate_card(material)
 
@@ -360,7 +360,7 @@ def render_result(material: str, data: dict) -> None:
 
 
 def render_compare_column(material: str, data: dict) -> None:
-    st.image(find_material_image(material), caption=material, use_container_width=True)
+    st.image(find_material_image(material, st.session_state.dark_mode), caption=material, use_container_width=True)
     render_rate_card(material)
     for key, title in SECTIONS:
         content = data.get(key, "").strip()
